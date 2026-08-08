@@ -11,12 +11,15 @@
 - Proxmox host `pve` 9.1.4, VM storage `tank-vms`, bridge `vmbr0` (192.168.11.0/24).
 - Red Hat subscription active (trial; switch to Developer Subscription before expiry).
 - **Gate:** router DHCP scope confirmed to exclude `.60–.79` (Phase 0 leftover).
+  LAN sweep 2026-08-08: all DHCP clients sit at `.100+`; `.60` was occupied by the
+  pre-existing sllm-lab VM — moved to `.90` the same day, block is clean.
 
 ## Design
 
 ### 1 · Template (one-time, scripted)
 
-VM **9000 `rhel9-tpl`**: import the qcow2 as a virtio-scsi disk, add cloud-init drive,
+VM **9100 `rhel9-tpl`** (9000 is taken by an existing ubuntu template on this host):
+import the qcow2 as a virtio-scsi disk, add cloud-init drive,
 serial console, qemu-guest-agent enabled; convert to template. The template stays
 **unregistered** — clones get identity at first boot. Scripted in
 `terraform/proxmox/scripts/build-template.sh` (qm commands), documented, idempotent.
