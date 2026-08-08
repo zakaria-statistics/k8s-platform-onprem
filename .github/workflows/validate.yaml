@@ -1,0 +1,60 @@
+name: validate
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  terraform:
+    name: terraform gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: detect terraform files
+        id: tf
+        run: |
+          if find terraform -name '*.tf' -print -quit 2>/dev/null | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No .tf files yet — terraform gates skipped (armed for Phase 1)."
+          fi
+      - uses: hashicorp/setup-terraform@v3
+        if: steps.tf.outputs.present == 'true'
+      - name: fmt
+        if: steps.tf.outputs.present == 'true'
+        run: terraform fmt -check -recursive terraform/
+      - name: validate
+        if: steps.tf.outputs.present == 'true'
+        run: |
+          for dir in terraform/*/; do
+            if find "$dir" -maxdepth 1 -name '*.tf' | grep -q .; then
+              echo "--- $dir"
+              terraform -chdir="$dir" init -backend=false -input=false
+              terraform -chdir="$dir" validate
+            fi
+          done
+      - uses: aquasecurity/tfsec-action@v1.0.3
+        if: steps.tf.outputs.present == 'true'
+        with:
+          working_directory: terraform
+      - uses: bridgecrewio/checkov-action@v12
+        if: steps.tf.outputs.present == 'true'
+        with:
+          directory: terraform
+          framework: terraform

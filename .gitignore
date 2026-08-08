@@ -1,0 +1,42 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Ansible
+*.retry
+ansible/inventory/*.ini
+ansible/inventory/hosts.yaml
+vault-pass*
+
+# Credentials / keys — never committed, no exceptions
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+*.kubeconfig
+kubeconfig*
+.kube/
+*.pfx
+*.p12
+.env
+.env.*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
