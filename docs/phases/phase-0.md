@@ -1,6 +1,6 @@
 # Phase 0 — Bootstrap
 
-> Status: **in progress** · designed 2026-08-08 · rhythm: every phase gets a design doc
+> Status: **complete** (2026-08-08) · rhythm: every phase gets a design doc
 > here, reviewed, before its first implementation PR.
 
 ## Deliverable
@@ -36,7 +36,7 @@ Three public repos that enforce quality and security from commit #1, before any 
 - [ ] All three repos public with skeleton + docs + CI green
 - [ ] `main` protected, `dev` default — on all three
 - [x] Red Hat account created (user) — portal login confirmed 2026-08-08
-- [ ] Router DHCP scope confirmed to exclude 192.168.11.60–79 (user)
+- [x] Router DHCP scope confirmed to exclude 192.168.11.60–79 — pool set to .100–.199 (router UI, 2026-08-08)
 
 ## Out of scope
 
