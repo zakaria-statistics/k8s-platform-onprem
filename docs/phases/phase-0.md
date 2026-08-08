@@ -35,7 +35,7 @@ Three public repos that enforce quality and security from commit #1, before any 
 
 - [ ] All three repos public with skeleton + docs + CI green
 - [ ] `main` protected, `dev` default — on all three
-- [ ] Red Hat account created (user) — needed for RHEL 9 dev subscription
+- [x] Red Hat account created (user) — portal login confirmed 2026-08-08
 - [ ] Router DHCP scope confirmed to exclude 192.168.11.60–79 (user)
 
 ## Out of scope
