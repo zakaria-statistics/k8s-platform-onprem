@@ -7,7 +7,7 @@
 ## Inputs (verified present)
 
 - RHEL 9.8 KVM guest image at `/tank/iso/rhel-9.8-x86_64-kvm.qcow2` (qcow2 verified;
-  sha256 `b99091f1…48a7e4e` — cross-check against portal pending).
+  sha256 `b99091f1…48a7e4e` matches the portal checksum — confirmed 2026-08-09).
 - Proxmox host `pve` 9.1.4, VM storage `tank-vms`, bridge `vmbr0` (192.168.11.0/24).
 - Red Hat subscription active (trial; switch to Developer Subscription before expiry).
 - **Gate:** router DHCP scope confirmed to exclude `.60–.79` (Phase 0 leftover).
