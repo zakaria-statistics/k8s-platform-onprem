@@ -1,6 +1,6 @@
 # Phase 1 — Ground: VMs to a running cluster
 
-> Status: **design for review** · drafted 2026-08-08 · builds nothing until reviewed.
+> Status: **approved** (2026-08-09) · drafted 2026-08-08 · building on `feature/phase-1-ground`.
 > Deliverable: `terraform apply` + one playbook = 3 RHEL 9 nodes running Kubernetes
 > with Cilium, rebuildable from empty. Closes with tag **v1.0**.
 
@@ -59,10 +59,14 @@ flowchart LR
   Hubble `4244`. **SELinux stays enforcing.** Kernel modules `overlay`, `br_netfilter`;
   sysctl ip_forward; swap off (guest image ships without — verified during build).
 - **containerd:** from Docker's repo, `SystemdCgroup = true`, with `container-selinux`.
-- **k8s-packages:** kubeadm/kubelet/kubectl from `pkgs.k8s.io` (latest stable minor,
-  pinned in one variable), versionlock.
+- **k8s-packages:** kubeadm/kubelet/kubectl from `pkgs.k8s.io` — **v1.35** (n-1;
+  latest stable is 1.36), pinned in one variable, versionlock. Deliberate: leaves a
+  real `kubeadm upgrade` 1.35→1.36 to practice as a later drill.
 - **kubeadm-init:** pod CIDR `10.244.0.0/16`, service CIDR `10.96.0.0/12`,
   `skip-phases=addon/kube-proxy` (Cilium replaces it). Join token → workers.
+  API endpoint: **raw IP `.60`**, no extra SANs — deliberate: when the endpoint
+  eventually needs to move, we hit the certificate-SAN limitation for real and
+  document the fix (that future incident is the SAN lesson).
 - **cilium:** Helm install — kube-proxy replacement on, Hubble + relay + UI on.
 
 ### 4 · Cilium validation gate (ADR-0003 risk)
@@ -106,12 +110,12 @@ Work on `feature/phase-1-ground` → PRs into `dev` (terraform gates go live on 
 MetalLB, ingress, cert-manager, NFS StorageClass (Phase 2) · any workload beyond the
 smoke test (Phase 3) · observability (Phase 5).
 
-## Open questions for review
+## Decisions (review closed 2026-08-09)
 
-1. Kubernetes version: pin latest stable (1.34.x at time of build) or n-1 for maximal
-   docs/tooling compatibility? *(default: latest stable)*
-2. Cluster API endpoint: raw IP `.60` or a hosts-entry name like `k8s-api.lab` baked
-   into kubeadm's cert SANs from day 1? *(default: name + SAN — free now, saves pain
-   if the endpoint ever moves)*
-3. Drill timing: run both drills before tagging v1.0 (as designed), or tag first and
-   drill after? *(default: drills gate the tag)*
+1. Kubernetes version: **n-1 (v1.35)** — leaves the 1.35→1.36 upgrade as a future
+   hands-on drill instead of starting at the ceiling.
+2. Cluster API endpoint: **raw IP `.60`** — accept the limitation knowingly; the day
+   the endpoint must move becomes the lesson on cert SANs (documented as an incident
+   when it happens).
+3. Drill timing: **drills gate the tag** (default accepted) — v1.0 only after both
+   postmortems merge.
